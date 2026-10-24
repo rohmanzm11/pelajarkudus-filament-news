@@ -9,7 +9,7 @@
             Post Comment
         </button>
     @else
-        <a wire:navigate class="py-1 text-yellow-500 underline" href="{{ route('login') }}"> Login to Post Comments</a>
+        <a wire:navigate class="py-1 text-primary-500 underline" href="{{ route('login') }}"> Login to Post Comments</a>
     @endauth
     <div class="px-3 py-2 mt-5 user-comments">
         @forelse($this->comments as $comment)

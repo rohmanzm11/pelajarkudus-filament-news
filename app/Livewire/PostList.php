@@ -51,7 +51,7 @@ class PostList extends Component
                 $query->withCategory($this->category);
             })
             ->where('title', 'like', "%{$this->search}%")
-            ->paginate(3);
+            ->paginate(9);
     }
 
     #[Computed()]
@@ -64,4 +64,14 @@ class PostList extends Component
     {
         return view('livewire.post-list');
     }
+
+    public function updatedCategory()
+{
+    $this->resetPage();
+}
+
+public function updatedSearch()
+{
+    $this->resetPage();
+}
 }

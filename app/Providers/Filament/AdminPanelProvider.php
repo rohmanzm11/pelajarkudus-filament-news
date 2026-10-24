@@ -27,9 +27,25 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
-            ->colors([
-                'primary' => Color::Amber,
-            ])
+           ->colors([
+    'primary' => [
+        50  => '250, 232, 255',
+        100 => '245, 208, 254',
+        200 => '240, 171, 252',
+        300 => '232, 121, 249',
+        400 => '217, 70, 239',
+        500 => '192, 38, 211',
+        600 => '162, 28, 175',   // warna tombol utama (light mode)
+        700 => '134, 25, 143',
+        800 => '112, 26, 117',
+        900 => '74, 4, 78',
+        950 => '59, 3, 63',
+    ],
+])
+             ->brandName('Pelajarkudus')
+            ->brandLogo(fn () => view('filament.brand'))
+            ->brandLogoHeight('2rem')
+            // ->favicon(asset('logo/logo-warna.png'))
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
@@ -37,8 +53,10 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
-                Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
+                // Widgets\AccountWidget::class,
+                // Widgets\FilamentInfoWidget::class,
+                 \App\Filament\Widgets\BlogStatsOverview::class,
+                 \App\Filament\Widgets\LatestPostsWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,
