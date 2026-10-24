@@ -107,8 +107,8 @@ Lalu buka file `.env` dan atur database:
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
-DB_DATABASE=pelajarkudus_news
-DB_USERNAME=root
+DB_DATABASE=laravel
+DB_USERNAME=
 DB_PASSWORD=
 ```
 
@@ -122,9 +122,6 @@ php artisan migrate
 
 Jika tersedia seeder:
 
-```bash
-php artisan migrate --seed
-```
 
 ### 5. Buat symbolic link storage
 
