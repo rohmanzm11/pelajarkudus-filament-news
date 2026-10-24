@@ -1,6 +1,6 @@
 <div align="center">
 
-# 📰 Pelajar Kudus News
+# Pelajar Kudus News
 
 **Sistem manajemen berita modern berbasis Laravel & Filament**
 
@@ -8,20 +8,14 @@
   <a href="https://laravel.com" target="_blank">
     <img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" height="60" alt="Laravel">
   </a>
-  &nbsp;&nbsp;&nbsp;
-  <a href="https://filamentphp.com" target="_blank">
-    <img src="https://raw.githubusercontent.com/filamentphp/filament/3.x/art/banner.jpg" height="60" alt="Filament">
-  </a>
-  &nbsp;&nbsp;&nbsp;
-  <a href="https://livewire.laravel.com" target="_blank">
-    <img src="https://raw.githubusercontent.com/livewire/livewire/main/art/logo.svg" height="60" alt="Livewire">
-  </a>
 </p>
 
 <p>
-  <img src="https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white" alt="Laravel">
-  <img src="https://img.shields.io/badge/Filament-FDAE4B?style=for-the-badge&logo=laravel&logoColor=white" alt="Filament">
-  <img src="https://img.shields.io/badge/Livewire-FB70A9?style=for-the-badge&logo=livewire&logoColor=white" alt="Livewire">
+  <a href="https://filamentphp.com" target="_blank"><img src="https://img.shields.io/badge/%F0%9F%92%A1_Filament-FDAE4B?style=for-the-badge&labelColor=27272A" height="40" alt="Filament"></a>
+  <a href="https://livewire.laravel.com" target="_blank"><img src="https://img.shields.io/badge/%E2%9A%A1_Livewire-FB70A9?style=for-the-badge&labelColor=27272A" height="40" alt="Livewire"></a>
+</p>
+
+<p>
   <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind CSS">
   <img src="https://img.shields.io/badge/PHP-777BB4?style=for-the-badge&logo=php&logoColor=white" alt="PHP">
   <img src="https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white" alt="MySQL">
