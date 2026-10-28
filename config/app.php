@@ -70,7 +70,9 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    'timezone' => 'Asia/Jakarta',
+
+    'redaksi_email' => env('REDAKSI_EMAIL', 'redaksipelajarkudus@gmail.com'),
 
     /*
     |--------------------------------------------------------------------------

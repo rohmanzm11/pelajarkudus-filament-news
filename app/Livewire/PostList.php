@@ -9,6 +9,7 @@ use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
+use App\Models\PostView;
 
 class PostList extends Component
 {
@@ -59,6 +60,19 @@ class PostList extends Component
     {
         return Category::where('slug', $this->category)->first();
     }
+    #[Computed()]
+public function readIds(): array
+{
+    $visitorId = request()->cookie('visitor_id');
+
+    if (! $visitorId) {
+        return [];
+    }
+
+    return PostView::where('visitor_id', $visitorId)
+        ->pluck('post_id')
+        ->toArray();
+}
 
     public function render()
     {

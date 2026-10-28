@@ -23,9 +23,15 @@
                 wire:click="setSort('asc')">Oldest</button>
         </div>
     </div>
-    <div class="py-4">
+        <div class="py-4">
         @foreach ($this->posts as $post)
-            <x-posts.post-item :post="$post" />
+            <x-posts.post-item :post="$post" wire:key="post-{{ $post->id }}" />
+
+            @if ($loop->iteration % 5 === 0 && ! $loop->last)
+                <div wire:key="banner-{{ $loop->iteration }}">
+                   <x-banners.placement placement="post_list" :limit="1" class="my-8" />
+                </div>
+            @endif
         @endforeach
     </div>
 

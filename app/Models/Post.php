@@ -33,6 +33,11 @@ class Post extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
+    public function viewLogs()
+{
+    return $this->hasMany(PostView::class);
+}
+
     public function categories()
     {
         return $this->belongsToMany(Category::class);

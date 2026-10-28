@@ -3,6 +3,8 @@
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PostController;
 use Illuminate\Support\Facades\Route;
+use App\Models\Banner;
+use App\Livewire\Redaksi;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,11 +17,22 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+
+
+Route::get('/redaksi', Redaksi::class)->name('redaksi');
+
 Route::get('/', HomeController::class)->name('home');
 
 Route::get('/blog', [PostController::class, 'index'])->name('posts.index');
 
 Route::get('/blog/{post:slug}', [PostController::class, 'show'])->name('posts.show');
+Route::get('/b/{banner}', function (Banner $banner) {
+    abort_unless($banner->url, 404);
+
+    $banner->increment('clicks');
+
+    return redirect()->away($banner->url);
+})->name('banners.go');
 
 Route::middleware([
     'auth:sanctum',

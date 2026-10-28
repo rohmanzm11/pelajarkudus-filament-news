@@ -8,6 +8,7 @@
             @include('posts.partials.search-box')
 
             @include('posts.partials.categories-box')
+            <x-banners.placement placement="sidebar" />
         </div>
     </div>
 
