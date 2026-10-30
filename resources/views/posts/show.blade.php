@@ -45,17 +45,15 @@
         <div class="py-3 text-lg prose text-justify text-gray-800 article-content">
             {!! $post->body !!}
         </div>
-        <!-- <div class="py-3 text-lg prose text-justify text-gray-800 article-content">
-            {!! $post->body !!}
-        </div> -->
-
-                <div class="flex items-center mt-10 space-x-4">
+                <div class="flex items-center mt-10 mb-6 space-x-4">
             @foreach ($post->categories as $category)
                 <x-posts.category-badge :category="$category" />
             @endforeach
         </div>
 
-        <x-banners.placement placement="post_bottom" class="mt-8" />
+       <x-banners.placement placement="post_top" class="mb-8" />
+
+<livewire:related-posts :key="'related-' . $post->id" :$post />
 
         <livewire:post-comments :key="'comments' . $post->id" :$post />
     </article>

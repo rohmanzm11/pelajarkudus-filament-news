@@ -44,7 +44,7 @@ class AdminPanelProvider extends PanelProvider
 ])
              ->brandName('Pelajarkudus')
             ->brandLogo(fn () => view('filament.brand'))
-            ->brandLogoHeight('2rem')
+            ->brandLogoHeight('3.5rem')
             // ->favicon(asset('logo/logo-warna.png'))
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
@@ -55,8 +55,11 @@ class AdminPanelProvider extends PanelProvider
             ->widgets([
                 // Widgets\AccountWidget::class,
                 // Widgets\FilamentInfoWidget::class,
+                \App\Filament\Widgets\PublicSiteCards::class,
                  \App\Filament\Widgets\BlogStatsOverview::class,
                  \App\Filament\Widgets\LatestPostsWidget::class,
+                 \App\Filament\Widgets\PostViewsChart::class,
+                //  \App\Filament\Widgets\TopPostsWIdget::class,
             ])
             ->middleware([
                 EncryptCookies::class,

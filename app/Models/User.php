@@ -11,8 +11,9 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
+use Filament\Models\Contracts\HasAvatar;
 
-class User extends Authenticatable implements FilamentUser
+class User extends Authenticatable implements FilamentUser, HasAvatar
 {
     use HasApiTokens;
     use HasFactory;
@@ -58,6 +59,7 @@ class User extends Authenticatable implements FilamentUser
         'name',
         'email',
         'password',
+        'profile_photo_path',
         'role',
     ];
 
@@ -104,5 +106,9 @@ class User extends Authenticatable implements FilamentUser
     public function comments()
     {
         return $this->hasMany(Comment::class);
+    }
+    public function getFilamentAvatarUrl(): ?string
+    {
+        return $this->profile_photo_url;
     }
 }

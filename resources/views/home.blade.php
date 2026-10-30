@@ -1,4 +1,4 @@
-<x-app-layout title="Home Page">
+<x-app-layout title="Pelajar Kudus">
 
     {{-- ============ 1. HERO: gambar full + kartu teks ============ --}}
     <x-slot:hero>

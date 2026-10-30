@@ -1,6 +1,8 @@
-<div class="flex items-center gap-2">
-    <img src="{{ asset('logo/logo-warna.png') }}" alt="Pelajarkudus" class="h-8 w-auto">
-    <span class="text-lg font-bold tracking-tight text-gray-900 dark:text-white">
-        Pelajarkudus
+<div class="inline-flex flex-col items-start gap-0.5 py-1">
+    <img src="{{ asset('logo/logo-warna.png') }}"
+         alt="Pelajarkudus"
+         class="h-9 w-auto">
+    <span class="text-xs text-gray-500 dark:text-gray-400">
+        Media pelajar terdepan
     </span>
 </div>

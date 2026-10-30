@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use App\Enums\PostStatus;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -26,7 +28,10 @@ class Post extends Model
 
     protected $casts = [
         'published_at' => 'datetime',
+        'featured'     => 'boolean',
     ];
+
+    /* ---------- Relasi ---------- */
 
     public function author()
     {
@@ -34,9 +39,9 @@ class Post extends Model
     }
 
     public function viewLogs()
-{
-    return $this->hasMany(PostView::class);
-}
+    {
+        return $this->hasMany(PostView::class);
+    }
 
     public function categories()
     {
@@ -51,6 +56,34 @@ class Post extends Model
     public function likes()
     {
         return $this->belongsToMany(User::class, 'post_like')->withTimestamps();
+    }
+
+    /* ---------- Status (dihitung dari published_at) ---------- */
+
+    protected function status(): Attribute
+    {
+        return Attribute::get(fn (): PostStatus => match (true) {
+            $this->published_at === null    => PostStatus::Draft,
+            $this->published_at->isFuture() => PostStatus::Scheduled,
+            default                         => PostStatus::Published,
+        });
+    }
+
+    public function isPublished(): bool
+    {
+        return $this->status === PostStatus::Published;
+    }
+
+    /* ---------- Scope ---------- */
+
+    public function scopeDraft($query)
+    {
+        $query->whereNull('published_at');
+    }
+
+    public function scopeScheduled($query)
+    {
+        $query->where('published_at', '>', Carbon::now());
     }
 
     public function scopePublished($query)
@@ -70,6 +103,8 @@ class Post extends Model
         $query->where('featured', true);
     }
 
+    /* ---------- Helper ---------- */
+
     public function getExcerpt()
     {
         return Str::limit(strip_tags($this->body), 150);
@@ -83,13 +118,13 @@ class Post extends Model
     }
 
     public function getThumbnailUrl()
-{
-    if (blank($this->image)) {
-        return asset('images/placeholder.jpg');
-    }
+    {
+        if (blank($this->image)) {
+            return asset('images/placeholder.jpg');
+        }
 
-    return str_contains($this->image, 'http')
-        ? $this->image
-        : Storage::disk('public')->url($this->image);
-}
+        return str_contains($this->image, 'http')
+            ? $this->image
+            : Storage::disk('public')->url($this->image);
+    }
 }

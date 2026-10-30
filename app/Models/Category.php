@@ -20,4 +20,9 @@ class Category extends Model
     {
         return $this->belongsToMany(Post::class);
     }
+
+    public function isInMenu(): bool
+    {
+        return in_array($this->slug, config('blog.menu_slugs', []), true);
+    }
 }

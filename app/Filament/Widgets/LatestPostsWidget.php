@@ -13,9 +13,12 @@ class LatestPostsWidget extends Widget
 {
     protected static string $view = 'filament.widgets.latest-posts-widget';
 
-    protected static ?int $sort = 2;
+    protected static ?int $sort = 3;
 
     protected int | string | array $columnSpan = 'full';
+
+    /** Jumlah berita yang ditampilkan. */
+    protected int $limit = 6;
 
     protected function getViewData(): array
     {
@@ -30,26 +33,38 @@ class LatestPostsWidget extends Widget
     {
         return Post::query()
             ->with('author')
-            ->latest()
-            ->limit(5)
+            // Terbit dulu, lalu terjadwal, lalu draft; di tiap kelompok terbaru di atas.
+            ->orderByRaw('CASE
+                WHEN published_at IS NULL THEN 2
+                WHEN published_at > NOW() THEN 1
+                ELSE 0
+            END')
+            ->orderByDesc('published_at')
+            ->orderByDesc('id')
+            ->limit($this->limit)
             ->get()
-            ->map(function (Post $post) {
-                [$label, $dot] = match (true) {
-                    $post->published_at === null    => ['Draft', 'bg-gray-400'],
-                    $post->published_at->isFuture() => ['Terjadwal', 'bg-amber-500'],
-                    default                         => ['Terbit', 'bg-emerald-500'],
+            ->map(function (Post $post): array {
+                [$label, $color, $icon] = match (true) {
+                    $post->published_at === null    => ['Draft', 'gray', 'heroicon-m-pencil-square'],
+                    $post->published_at->isFuture() => ['Terjadwal', 'warning', 'heroicon-m-clock'],
+                    default                         => ['Terbit', 'success', 'heroicon-m-check-circle'],
                 };
+
+                $isLive = $post->published_at && ! $post->published_at->isFuture();
 
                 return [
                     'title'     => $post->title,
                     'image'     => $post->image ? Storage::disk('public')->url($post->image) : null,
                     'featured'  => (bool) $post->featured,
                     'author'    => $post->author?->name ?? '-',
-                    'date'      => $post->published_at?->translatedFormat('d M Y') ?? 'Belum dijadwalkan',
+                    'day'       => $post->published_at?->translatedFormat('d M'),
+                    'year'      => $post->published_at?->format('Y'),
+                    'ago'       => $post->published_at?->diffForHumans(),
                     'status'    => $label,
-                    'dot'       => $dot,
+                    'color'     => $color,
+                    'icon'      => $icon,
                     'editUrl'   => PostResource::getUrl('edit', ['record' => $post]),
-                    'publicUrl' => $post->published_at && ! $post->published_at->isFuture() && Route::has('posts.show')
+                    'publicUrl' => $isLive && Route::has('posts.show')
                         ? route('posts.show', $post->slug)
                         : null,
                 ];

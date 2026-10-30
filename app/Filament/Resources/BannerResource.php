@@ -6,11 +6,23 @@ use App\Enums\BannerPlacement;
 use App\Filament\Resources\BannerResource\Pages;
 use App\Models\Banner;
 use BackedEnum;
-use Filament\Forms;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Group;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Resources\Resource;
+use Filament\Support\Enums\FontWeight;
 use Filament\Tables;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ToggleColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 
 class BannerResource extends Resource
@@ -19,113 +31,150 @@ class BannerResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-megaphone';
 
+    protected static ?string $navigationGroup = 'Promosi';
+
+    protected static ?int $navigationSort = 1;
+
     protected static ?string $navigationLabel = 'Banner Promosi';
 
     protected static ?string $modelLabel = 'Banner';
 
     protected static ?string $pluralModelLabel = 'Banner Promosi';
 
+    protected static ?string $recordTitleAttribute = 'title';
+
     public static function form(Form $form): Form
     {
-        return $form->schema([
-            Forms\Components\Section::make('Informasi')
-                ->compact()
-                ->columns(2)
-                ->schema([
-                    Forms\Components\TextInput::make('title')
-                        ->label('Judul Banner')
-                        ->required()
-                        ->columnSpanFull(),
-                    Forms\Components\Select::make('placement')
-                        ->label('Penempatan')
-                        ->options(BannerPlacement::options())
-                        ->live()
-                        ->required(),
-                    Forms\Components\TextInput::make('url')
-                        ->label('Tautan (URL)')
-                        ->url(),
-                ]),
+        return $form
+            ->columns(['default' => 1, 'lg' => 3])
+            ->schema([
 
-            Forms\Components\Section::make('Gambar')
-                ->compact()
-                ->columns(2)
-                ->schema([
-                    Forms\Components\FileUpload::make('image')
-                        ->label('Gambar desktop')
-                        ->image()
-                        ->imageEditor()
-                        ->directory('banners')
-                        ->imagePreviewHeight('120')
-                        ->helperText(fn (Get $get): string => static::sizeHint($get('placement')))
-                        ->required(),
-                    Forms\Components\FileUpload::make('image_mobile')
-                        ->label('Gambar mobile (opsional)')
-                        ->image()
-                        ->imageEditor()
-                        ->directory('banners')
-                        ->imagePreviewHeight('120')
-                        ->helperText('Opsional. Dipakai di layar kecil; jika kosong, gambar desktop digunakan.'),
-                ]),
+                // ───────── Kolom utama (2/3) ─────────
+                Group::make()
+                    ->columnSpan(['default' => 1, 'lg' => 2])
+                    ->schema([
+                        Section::make('Informasi')
+                            ->icon('heroicon-o-information-circle')
+                            ->columns(2)
+                            ->schema([
+                                TextInput::make('title')
+                                    ->label('Judul banner')
+                                    ->helperText('Nama internal sekaligus teks alternatif gambar.')
+                                    ->required()
+                                    ->columnSpanFull(),
 
-            Forms\Components\Section::make('Jadwal & Status')
-                ->compact()
-                ->columns(['default' => 1, 'md' => 3])
-                ->schema([
-                    Forms\Components\DateTimePicker::make('starts_at')
-                        ->label('Mulai')
-                        ->native(false),
-                    Forms\Components\DateTimePicker::make('ends_at')
-                        ->label('Berakhir')
-                        ->native(false)
-                        ->after('starts_at'),
-                    Forms\Components\TextInput::make('sort_order')
-                        ->label('Urutan')
-                        ->numeric()
-                        ->default(0),
-                    Forms\Components\Toggle::make('is_active')
-                        ->label('Aktif')
-                        ->default(true),
-                    Forms\Components\Toggle::make('open_in_new_tab')
-                        ->label('Buka di tab baru')
-                        ->default(true),
-                ]),
-        ]);
-    }
+                                Select::make('placement')
+                                    ->label('Penempatan')
+                                    ->options(BannerPlacement::class)
+                                    ->required()
+                                    ->live(),
 
-    protected static function sizeHint(mixed $placement): string
-    {
-        $value = $placement instanceof BackedEnum ? $placement->value : $placement;
+                                TextInput::make('url')
+                                    ->label('Tautan (URL)')
+                                    ->url()
+                                    ->placeholder('https://'),
+                            ]),
 
-        return match ($value) {
-            'home_below_hero' => 'Rekomendasi 1200×200 px.',
-            'post_top', 'post_bottom' => 'Rekomendasi 1200×200 px.',
-            'post_list' => 'Rekomendasi 1200×250 px.',
-            'sidebar' => 'Rekomendasi 300×300 px.',
-            default => 'Pilih penempatan dulu untuk melihat ukuran yang disarankan.',
-        };
+                        Section::make('Gambar')
+                            ->icon('heroicon-o-photo')
+                            ->columns(2)
+                            ->schema([
+                                FileUpload::make('image')
+                                    ->label('Gambar desktop')
+                                    ->image()
+                                    ->imageEditor()
+                                    ->disk('public')
+                                    ->directory('banners')
+                                    ->visibility('public')
+                                    ->maxSize(2048)
+                                    ->imagePreviewHeight('120')
+                                    ->helperText(fn (Get $get): string => self::sizeHint($get('placement')))
+                                    ->required(),
+
+                                FileUpload::make('image_mobile')
+                                    ->label('Gambar mobile (opsional)')
+                                    ->image()
+                                    ->imageEditor()
+                                    ->disk('public')
+                                    ->directory('banners')
+                                    ->visibility('public')
+                                    ->maxSize(2048)
+                                    ->imagePreviewHeight('120')
+                                    ->helperText('Dipakai di layar kecil; jika kosong, gambar desktop digunakan.'),
+                            ]),
+                    ]),
+
+                // ───────── Sidebar (1/3) ─────────
+                Group::make()
+                    ->columnSpan(['default' => 1, 'lg' => 1])
+                    ->schema([
+                        Section::make('Tayang')
+                            ->icon('heroicon-o-calendar-days')
+                            ->schema([
+                                Toggle::make('is_active')
+                                    ->label('Aktif')
+                                    ->default(true),
+
+                                Toggle::make('open_in_new_tab')
+                                    ->label('Buka di tab baru')
+                                    ->default(true),
+
+                                DateTimePicker::make('starts_at')
+                                    ->label('Mulai')
+                                    ->native(false)
+                                    ->seconds(false)
+                                    ->helperText('Kosong = langsung tayang.'),
+
+                                DateTimePicker::make('ends_at')
+                                    ->label('Berakhir')
+                                    ->native(false)
+                                    ->seconds(false)
+                                    ->after('starts_at')
+                                    ->helperText('Kosong = tanpa batas.'),
+
+                                TextInput::make('sort_order')
+                                    ->label('Urutan')
+                                    ->numeric()
+                                    ->default(0)
+                                    ->minValue(0),
+                            ]),
+                    ]),
+            ]);
     }
 
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                Tables\Columns\ImageColumn::make('image')
+                ImageColumn::make('image')
                     ->label('Gambar')
-                    ->width(80)
-                    ->height(40)
-                    ->extraImgAttributes(['class' => 'rounded object-cover']),
+                    ->disk('public')
+                    ->visibility('public')
+                    ->height(44)
+                    ->width(120)
+                    ->extraImgAttributes(['style' => 'border-radius: 0.375rem; object-fit: cover;']),
 
-                Tables\Columns\TextColumn::make('title')
+                TextColumn::make('title')
                     ->label('Judul')
+                    ->weight(FontWeight::SemiBold)
                     ->searchable()
-                    ->limit(30)
-                    ->weight('medium')
+                    ->limit(40)
                     ->description(fn (Banner $record): ?string => $record->placement?->getLabel()),
 
-                Tables\Columns\ToggleColumn::make('is_active')
+                TextColumn::make('status')
+                    ->label('Status')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'Tayang'    => 'success',
+                        'Terjadwal' => 'warning',
+                        'Berakhir'  => 'danger',
+                        default     => 'gray',
+                    }),
+
+                ToggleColumn::make('is_active')
                     ->label('Aktif'),
 
-                Tables\Columns\TextColumn::make('ends_at')
+                TextColumn::make('ends_at')
                     ->label('Periode')
                     ->sortable()
                     ->state(fn (Banner $record): string => ($record->starts_at?->format('d M Y') ?? 'Langsung')
@@ -133,20 +182,23 @@ class BannerResource extends Resource
                         . ($record->ends_at?->format('d M Y') ?? 'Tanpa batas'))
                     ->visibleFrom('md'),
 
-                Tables\Columns\TextColumn::make('clicks')
+                TextColumn::make('clicks')
                     ->label('Klik')
+                    ->icon('heroicon-m-cursor-arrow-rays')
                     ->numeric()
                     ->sortable()
+                    ->alignEnd()
                     ->visibleFrom('lg'),
             ])
             ->defaultSort('sort_order')
             ->reorderable('sort_order')
+            ->striped()
             ->filters([
-                Tables\Filters\SelectFilter::make('placement')
+                SelectFilter::make('placement')
                     ->label('Penempatan')
-                    ->options(BannerPlacement::options()),
+                    ->options(BannerPlacement::class),
 
-                Tables\Filters\TernaryFilter::make('is_active')
+                TernaryFilter::make('is_active')
                     ->label('Status aktif'),
             ])
             ->actions([
@@ -158,8 +210,9 @@ class BannerResource extends Resource
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ])
+            ->emptyStateIcon('heroicon-o-megaphone')
             ->emptyStateHeading('Belum ada banner')
-            ->emptyStateDescription('Klik "New banner" untuk menambahkan banner promosi pertama.');
+            ->emptyStateDescription('Klik "Tambah banner" untuk membuat banner promosi pertama.');
     }
 
     public static function getRelations(): array
@@ -172,9 +225,17 @@ class BannerResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListBanners::route('/'),
+            'index'  => Pages\ListBanners::route('/'),
             'create' => Pages\CreateBanner::route('/create'),
-            'edit' => Pages\EditBanner::route('/{record}/edit'),
+            'edit'   => Pages\EditBanner::route('/{record}/edit'),
         ];
+    }
+
+    protected static function sizeHint(mixed $placement): string
+    {
+        $value = $placement instanceof BackedEnum ? $placement->value : $placement;
+
+        return BannerPlacement::tryFrom((string) $value)?->sizeHint()
+            ?? 'Pilih penempatan dulu untuk melihat ukuran yang disarankan.';
     }
 }
